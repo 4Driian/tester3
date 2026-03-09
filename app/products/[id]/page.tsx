@@ -21,12 +21,6 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-export function generateStaticParams() {
-  return products.map((product) => ({
-    id: String(product.id),
-  }))
-}
-
 export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const router = useRouter()
