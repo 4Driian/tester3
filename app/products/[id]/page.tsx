@@ -8,6 +8,7 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { AIVisualization } from "@/components/ai-visualization"
 import { ScrollSection } from "@/components/scroll-section"
+import { ImageZoom } from "@/components/image-zoom"
 import { useScrollAnimation } from "@/hooks/use-scroll-animation"
 import { products, getProductById, getRelatedProducts, Product } from "@/lib/products"
 import {
