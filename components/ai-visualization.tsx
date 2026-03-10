@@ -5,6 +5,8 @@ import Image from 'next/image'
 import { Upload, Loader2, ArrowRight, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
+type ApplicationType = 'floor' | 'wall' | 'ceiling' | 'accent' | 'custom'
+
 interface AIVisualizationProps {
   productName: string
   productImage: string
@@ -26,7 +28,16 @@ export function AIVisualization({
   const [isDragging, setIsDragging] = useState(false)
   const [showBeforeAfter, setShowBeforeAfter] = useState(false)
   const [sliderPosition, setSliderPosition] = useState(50)
+  const [applicationType, setApplicationType] = useState<ApplicationType>('floor')
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const applicationTypes: { value: ApplicationType; label: string; description: string }[] = [
+    { value: 'floor', label: 'Floor', description: 'Apply to floor' },
+    { value: 'wall', label: 'Wall', description: 'Apply to walls' },
+    { value: 'ceiling', label: 'Ceiling', description: 'Apply to ceiling' },
+    { value: 'accent', label: 'Accent', description: 'Use as accent' },
+    { value: 'custom', label: 'Custom', description: 'Custom area' },
+  ]
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
@@ -72,7 +83,7 @@ export function AIVisualization({
       // TODO: Replace with actual AI API call
       // This is a placeholder that simulates the API call
       // You can integrate with Replicate, OpenAI, or your custom backend
-      
+
       // Example implementation:
       // const response = await fetch('/api/visualize', {
       //   method: 'POST',
@@ -82,6 +93,7 @@ export function AIVisualization({
       //     productImage,
       //     productName,
       //     productMaterial,
+      //     applicationType, // Send selected application type
       //   }),
       // })
       // const data = await response.json()
@@ -155,6 +167,33 @@ export function AIVisualization({
                     <span className="text-sm font-medium text-foreground">{productFinish}</span>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Application Type Selector */}
+            <div className="rounded-2xl bg-background border border-border/50 p-6">
+              <p className="text-sm font-medium text-foreground mb-4">Where would you like to apply it?</p>
+              <div className="grid grid-cols-2 gap-3">
+                {applicationTypes.map((type) => (
+                  <button
+                    key={type.value}
+                    onClick={() => setApplicationType(type.value)}
+                    className={cn(
+                      'p-3 rounded-lg text-sm transition-all duration-300 text-center',
+                      applicationType === type.value
+                        ? 'bg-foreground text-background font-medium'
+                        : 'bg-secondary text-foreground hover:bg-secondary/80 border border-border/50'
+                    )}
+                  >
+                    <div className="font-medium">{type.label}</div>
+                    <div className={cn(
+                      'text-xs mt-1',
+                      applicationType === type.value ? 'opacity-90' : 'opacity-70'
+                    )}>
+                      {type.description}
+                    </div>
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -240,11 +279,11 @@ export function AIVisualization({
                 {isGenerating ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Generating...</span>
+                    <span>Generating Preview...</span>
                   </>
                 ) : (
                   <>
-                    <span>Visualize This Material</span>
+                    <span>Apply on {applicationTypes.find(t => t.value === applicationType)?.label}</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}

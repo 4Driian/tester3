@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { MapPin, Phone, Clock, Navigation, Mail, ChevronRight, ExternalLink } from "lucide-react"
@@ -22,6 +23,7 @@ const showrooms = [
     description: "Our flagship showroom in the heart of SoHo, featuring three floors of premium surfaces and an exclusive designer consultation lounge.",
     mapCoords: { lat: 40.7233, lng: -73.9982 },
     features: ["Designer Consultations", "Material Library", "Sample Service"],
+    imageUrl: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600",
   },
   {
     id: 2,
@@ -38,6 +40,7 @@ const showrooms = [
     description: "A sun-filled California showroom showcasing our collections in natural light, with dedicated outdoor living displays.",
     mapCoords: { lat: 34.0830, lng: -118.3695 },
     features: ["Outdoor Collections", "Trade Program", "Installation Partners"],
+    imageUrl: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600",
   },
   {
     id: 3,
@@ -54,6 +57,7 @@ const showrooms = [
     description: "Located in the iconic Miami Design District, featuring tropical-inspired collections and waterfront living solutions.",
     mapCoords: { lat: 25.8127, lng: -80.1926 },
     features: ["Waterproof Collections", "Luxury Stone Gallery", "Virtual Tours"],
+    imageUrl: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600",
   },
   {
     id: 4,
@@ -70,6 +74,7 @@ const showrooms = [
     description: "An industrial-chic space in River North, showcasing our complete collection in a restored warehouse setting.",
     mapCoords: { lat: 41.8893, lng: -87.6369 },
     features: ["Architect Services", "Commercial Projects", "Warehouse Stock"],
+    imageUrl: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600",
   },
   {
     id: 5,
@@ -86,6 +91,7 @@ const showrooms = [
     description: "Our Texas flagship featuring expansive displays and a dedicated commercial projects center for large-scale installations.",
     mapCoords: { lat: 32.8208, lng: -96.7979 },
     features: ["Large Format Displays", "Commercial Center", "Builder Program"],
+    imageUrl: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600",
   },
 ]
 
@@ -147,27 +153,33 @@ export default function ShowroomsPage() {
                     key={showroom.id}
                     onClick={() => handleSelectShowroom(showroom)}
                     className={cn(
-                      "w-full text-left p-5 border transition-all duration-300 group rounded-xl",
+                      "w-full text-left p-5 border transition-all duration-300 group rounded-xl overflow-hidden relative",
                       selectedShowroom.id === showroom.id
-                        ? "bg-foreground text-background border-foreground"
-                        : "bg-transparent text-foreground border-border hover:border-foreground"
+                        ? "bg-foreground text-background border-foreground shadow-xl scale-105 origin-left"
+                        : "bg-transparent text-foreground border-border hover:border-foreground hover:bg-secondary/50"
                     )}
                   >
-                    <div className="flex items-center justify-between">
+                    {/* Background accent */}
+                    <div className={cn(
+                      "absolute inset-0 bg-gradient-to-r from-foreground/10 to-transparent opacity-0 transition-opacity duration-300",
+                      selectedShowroom.id === showroom.id && "opacity-100"
+                    )} />
+
+                    <div className="flex items-center justify-between relative z-10">
                       <div>
-                        <h3 className="font-serif text-xl mb-1">{showroom.name}</h3>
+                        <h3 className="font-serif text-xl mb-1 transition-all duration-300">{showroom.name}</h3>
                         <p className={cn(
-                          "text-sm",
+                          "text-sm transition-colors duration-300",
                           selectedShowroom.id === showroom.id
                             ? "text-background/70"
-                            : "text-muted-foreground"
+                            : "text-muted-foreground group-hover:text-foreground/80"
                         )}>
                           {showroom.city}
                         </p>
                       </div>
                       <ChevronRight className={cn(
-                        "w-5 h-5 transition-transform duration-300",
-                        selectedShowroom.id === showroom.id && "translate-x-1"
+                        "w-5 h-5 transition-all duration-300",
+                        selectedShowroom.id === showroom.id ? "translate-x-2" : "group-hover:translate-x-1"
                       )} />
                     </div>
                   </button>
@@ -178,9 +190,21 @@ export default function ShowroomsPage() {
             {/* Showroom Details - Right Side */}
             <div className="lg:col-span-8">
               <div className={cn(
-                "transition-all duration-300",
+                "transition-all duration-500",
                 isAnimating ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"
               )}>
+                {/* Featured Image */}
+                <div className="relative aspect-[16/9] mb-8 overflow-hidden rounded-2xl bg-secondary group">
+                  <Image
+                    src={selectedShowroom.imageUrl}
+                    alt={selectedShowroom.name}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    priority
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-charcoal/40" />
+                </div>
+
                 {/* Map - Full width */}
                 <div className="relative aspect-[16/9] mb-8 overflow-hidden rounded-2xl bg-secondary">
                   <iframe
@@ -203,7 +227,7 @@ export default function ShowroomsPage() {
                 </div>
 
                 {/* Showroom Info - Clean, organized layout */}
-                <div className="bg-secondary rounded-2xl p-8 lg:p-10">
+                <div className="bg-secondary rounded-2xl p-8 lg:p-10 border border-border/50 hover:border-border transition-colors duration-300">
                   <h3 className="font-serif text-2xl lg:text-3xl text-foreground mb-6">
                     {selectedShowroom.name} Showroom
                   </h3>
@@ -211,23 +235,23 @@ export default function ShowroomsPage() {
                   <div className="grid md:grid-cols-2 gap-8 mb-8">
                     {/* Location & Contact */}
                     <div className="space-y-5">
-                      <div className="flex items-start gap-4">
-                        <div className="p-2 bg-background rounded-lg">
-                          <MapPin className="w-5 h-5 text-muted-foreground" />
+                      <div className="flex items-start gap-4 p-4 rounded-lg hover:bg-background/50 transition-colors duration-300 group cursor-pointer">
+                        <div className="p-2 bg-background rounded-lg group-hover:bg-foreground group-hover:text-background transition-all duration-300">
+                          <MapPin className="w-5 h-5 text-muted-foreground group-hover:text-background" />
                         </div>
                         <div>
                           <p className="text-xs tracking-wider uppercase text-muted-foreground mb-1">Address</p>
-                          <p className="text-foreground">{selectedShowroom.fullAddress}</p>
+                          <p className="text-foreground group-hover:text-foreground transition-colors">{selectedShowroom.fullAddress}</p>
                         </div>
                       </div>
 
-                      <div className="flex items-start gap-4">
-                        <div className="p-2 bg-background rounded-lg">
-                          <Phone className="w-5 h-5 text-muted-foreground" />
+                      <div className="flex items-start gap-4 p-4 rounded-lg hover:bg-background/50 transition-colors duration-300 group cursor-pointer">
+                        <div className="p-2 bg-background rounded-lg group-hover:bg-foreground group-hover:text-background transition-all duration-300">
+                          <Phone className="w-5 h-5 text-muted-foreground group-hover:text-background" />
                         </div>
                         <div>
                           <p className="text-xs tracking-wider uppercase text-muted-foreground mb-1">Phone</p>
-                          <a 
+                          <a
                             href={`tel:${selectedShowroom.phone}`}
                             className="text-foreground hover:text-muted-foreground transition-colors"
                           >
@@ -236,13 +260,13 @@ export default function ShowroomsPage() {
                         </div>
                       </div>
 
-                      <div className="flex items-start gap-4">
-                        <div className="p-2 bg-background rounded-lg">
-                          <Mail className="w-5 h-5 text-muted-foreground" />
+                      <div className="flex items-start gap-4 p-4 rounded-lg hover:bg-background/50 transition-colors duration-300 group cursor-pointer">
+                        <div className="p-2 bg-background rounded-lg group-hover:bg-foreground group-hover:text-background transition-all duration-300">
+                          <Mail className="w-5 h-5 text-muted-foreground group-hover:text-background" />
                         </div>
                         <div>
                           <p className="text-xs tracking-wider uppercase text-muted-foreground mb-1">Email</p>
-                          <a 
+                          <a
                             href={`mailto:${selectedShowroom.email}`}
                             className="text-foreground hover:text-muted-foreground transition-colors"
                           >
@@ -254,14 +278,14 @@ export default function ShowroomsPage() {
 
                     {/* Hours */}
                     <div className="space-y-5">
-                      <div className="flex items-start gap-4">
-                        <div className="p-2 bg-background rounded-lg">
-                          <Clock className="w-5 h-5 text-muted-foreground" />
+                      <div className="flex items-start gap-4 p-4 rounded-lg hover:bg-background/50 transition-colors duration-300 group cursor-pointer">
+                        <div className="p-2 bg-background rounded-lg group-hover:bg-foreground group-hover:text-background transition-all duration-300">
+                          <Clock className="w-5 h-5 text-muted-foreground group-hover:text-background" />
                         </div>
                         <div>
                           <p className="text-xs tracking-wider uppercase text-muted-foreground mb-1">Opening Hours</p>
-                          <p className="text-foreground mb-1">{selectedShowroom.hours.weekday}</p>
-                          <p className="text-muted-foreground">{selectedShowroom.hours.weekend}</p>
+                          <p className="text-foreground mb-1 group-hover:text-foreground transition-colors">{selectedShowroom.hours.weekday}</p>
+                          <p className="text-muted-foreground group-hover:text-foreground/70 transition-colors">{selectedShowroom.hours.weekend}</p>
                         </div>
                       </div>
                     </div>
@@ -274,10 +298,13 @@ export default function ShowroomsPage() {
 
                   {/* Features */}
                   <div className="flex flex-wrap gap-3 mb-10">
-                    {selectedShowroom.features.map((feature) => (
+                    {selectedShowroom.features.map((feature, index) => (
                       <span
                         key={feature}
-                        className="px-4 py-2 bg-background text-sm text-foreground rounded-lg"
+                        className={cn(
+                          "px-4 py-2 bg-background text-sm text-foreground rounded-lg transition-all duration-300 hover:bg-foreground hover:text-background cursor-default",
+                          `animation-delay-${index * 100}`
+                        )}
                       >
                         {feature}
                       </span>
@@ -290,7 +317,7 @@ export default function ShowroomsPage() {
                       href={getGoogleMapsDirectionsUrl(selectedShowroom)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-3 bg-foreground text-background px-8 py-4 rounded-lg text-sm tracking-wider uppercase transition-all duration-300 hover:bg-foreground/90"
+                      className="inline-flex items-center justify-center gap-3 bg-foreground text-background px-8 py-4 rounded-lg text-sm tracking-wider uppercase transition-all duration-300 hover:bg-foreground/90 active:scale-95"
                     >
                       <Navigation className="w-4 h-4" />
                       <span>Get Directions</span>
@@ -298,13 +325,13 @@ export default function ShowroomsPage() {
                     </a>
                     <a
                       href={`mailto:${selectedShowroom.email}?subject=Showroom%20Visit%20Request`}
-                      className="inline-flex items-center justify-center gap-3 border border-border text-foreground px-8 py-4 rounded-lg text-sm tracking-wider uppercase transition-all duration-300 hover:bg-foreground hover:text-background"
+                      className="inline-flex items-center justify-center gap-3 border border-border text-foreground px-8 py-4 rounded-lg text-sm tracking-wider uppercase transition-all duration-300 hover:bg-foreground hover:text-background hover:border-foreground active:scale-95"
                     >
                       <span>Book Appointment</span>
                     </a>
                     <a
                       href={`tel:${selectedShowroom.phone}`}
-                      className="inline-flex items-center justify-center gap-3 border border-border text-foreground px-8 py-4 rounded-lg text-sm tracking-wider uppercase transition-all duration-300 hover:bg-foreground hover:text-background"
+                      className="inline-flex items-center justify-center gap-3 border border-border text-foreground px-8 py-4 rounded-lg text-sm tracking-wider uppercase transition-all duration-300 hover:bg-foreground hover:text-background hover:border-foreground active:scale-95"
                     >
                       <Phone className="w-4 h-4" />
                       <span>Call Now</span>

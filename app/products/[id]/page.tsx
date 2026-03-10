@@ -6,15 +6,16 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
+import { AIVisualization } from "@/components/ai-visualization"
 import { products, getProductById, getRelatedProducts, Product } from "@/lib/products"
-import { 
-  ArrowLeft, 
-  ArrowRight, 
-  Check, 
-  ChevronRight, 
-  Download, 
-  Mail, 
-  MapPin, 
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  ChevronRight,
+  Download,
+  Mail,
+  MapPin,
   Maximize2,
   X,
   ArrowUpRight
@@ -272,6 +273,17 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         </div>
       </section>
 
+      {/* AI Visualization Tool */}
+      {product && (
+        <AIVisualization
+          productName={product.name}
+          productImage={product.gallery[0]}
+          productMaterial={product.material}
+          productFinish={product.finish}
+          productCollection={product.collection}
+        />
+      )}
+
       {/* Related Products */}
       {relatedProductsData.length > 0 && (
         <section className="py-16 lg:py-24">
@@ -295,35 +307,47 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {relatedProductsData.map((relatedProduct) => (
+              {relatedProductsData.map((relatedProduct, index) => (
                 <Link
                   key={relatedProduct.id}
                   href={`/products/${relatedProduct.id}`}
                   className="group"
+                  style={{
+                    animation: `slide-up 0.6s ease-out ${index * 0.1}s both`,
+                  }}
                 >
-                  <div className="relative aspect-[4/5] overflow-hidden rounded-2xl mb-4">
+                  <div className="relative aspect-[4/5] overflow-hidden rounded-2xl mb-4 bg-secondary border border-border/0 group-hover:border-border transition-all duration-500">
                     <Image
                       src={relatedProduct.image}
                       alt={relatedProduct.name}
                       fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
                     />
-                    <div className="absolute inset-0 bg-charcoal/0 group-hover:bg-charcoal/20 transition-colors duration-300" />
-                    
+                    <div className="absolute inset-0 bg-charcoal/0 group-hover:bg-charcoal/30 transition-colors duration-300" />
+
+                    {/* Hover overlay with info */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-charcoal/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                      <div className="w-full">
+                        <p className="text-warm-white text-xs tracking-wider uppercase mb-2 opacity-90">
+                          {relatedProduct.material} / {relatedProduct.finish}
+                        </p>
+                      </div>
+                    </div>
+
                     {/* Hover arrow */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="p-4 bg-warm-white rounded-full shadow-xl">
-                        <ArrowUpRight className="w-5 h-5 text-charcoal" />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-100 scale-75">
+                      <div className="p-4 bg-warm-white rounded-full shadow-2xl transform group-hover:scale-100 scale-90 transition-transform duration-500">
+                        <ArrowUpRight className="w-6 h-6 text-charcoal" />
                       </div>
                     </div>
                   </div>
-                  <span className="text-xs tracking-wider text-muted-foreground uppercase">
+                  <span className="text-xs tracking-wider text-muted-foreground uppercase block transition-colors duration-300 group-hover:text-foreground">
                     {relatedProduct.collection}
                   </span>
-                  <h3 className="font-serif text-xl text-foreground mt-1 group-hover:text-muted-foreground transition-colors">
+                  <h3 className="font-serif text-xl text-foreground mt-2 group-hover:text-muted-foreground transition-all duration-300 group-hover:translate-y-[-2px]">
                     {relatedProduct.name}
                   </h3>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-sm text-muted-foreground mt-2 group-hover:text-foreground/70 transition-colors duration-300">
                     {relatedProduct.material} / {relatedProduct.finish}
                   </p>
                 </Link>
