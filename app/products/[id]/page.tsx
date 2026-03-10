@@ -1,12 +1,14 @@
 "use client"
 
-import { useState, useEffect, use } from "react"
+import { useState, useEffect, use, useRef } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { AIVisualization } from "@/components/ai-visualization"
+import { ScrollSection } from "@/components/scroll-section"
+import { useScrollAnimation } from "@/hooks/use-scroll-animation"
 import { products, getProductById, getRelatedProducts, Product } from "@/lib/products"
 import {
   ArrowLeft,
@@ -225,7 +227,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20">
             {/* Features */}
-            <div>
+            <ScrollSection animation="fade-left">
               <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-8">Features</h2>
               <ul className="space-y-4">
                 {product.features.map((feature, index) => (
@@ -237,10 +239,10 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                   </li>
                 ))}
               </ul>
-            </div>
+            </ScrollSection>
 
             {/* Specifications */}
-            <div>
+            <ScrollSection animation="fade-right">
               <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-8">Specifications</h2>
               <div className="space-y-4">
                 <div className="flex justify-between py-4 border-b border-border">
@@ -268,7 +270,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                   <span className="text-foreground font-medium">{product.specifications.rectified ? "Yes" : "No"}</span>
                 </div>
               </div>
-            </div>
+            </ScrollSection>
           </div>
         </div>
       </section>
@@ -288,71 +290,64 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       {relatedProductsData.length > 0 && (
         <section className="py-16 lg:py-24">
           <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-            <div className="flex items-end justify-between mb-12">
-              <div>
-                <span className="text-xs tracking-[0.3em] uppercase text-muted-foreground mb-4 block">
-                  You May Also Like
-                </span>
-                <h2 className="font-serif text-3xl md:text-4xl text-foreground">
-                  Related Products
-                </h2>
-              </div>
-              <Link 
-                href="/products"
-                className="hidden sm:inline-flex items-center gap-2 text-foreground text-sm tracking-wider uppercase hover:gap-4 transition-all duration-300"
-              >
-                <span>View All</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {relatedProductsData.map((relatedProduct, index) => (
-                <Link
-                  key={relatedProduct.id}
-                  href={`/products/${relatedProduct.id}`}
-                  className="group"
-                  style={{
-                    animation: `slide-up 0.6s ease-out ${index * 0.1}s both`,
-                  }}
-                >
-                  <div className="relative aspect-[4/5] overflow-hidden rounded-2xl mb-4 bg-secondary border border-border/0 group-hover:border-border transition-all duration-500">
-                    <Image
-                      src={relatedProduct.image}
-                      alt={relatedProduct.name}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-charcoal/0 group-hover:bg-charcoal/30 transition-colors duration-300" />
-
-                    {/* Hover overlay with info */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-charcoal/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
-                      <div className="w-full">
-                        <p className="text-warm-white text-xs tracking-wider uppercase mb-2 opacity-90">
-                          {relatedProduct.material} / {relatedProduct.finish}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Hover arrow */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-100 scale-75">
-                      <div className="p-4 bg-warm-white rounded-full shadow-2xl transform group-hover:scale-100 scale-90 transition-transform duration-500">
-                        <ArrowUpRight className="w-6 h-6 text-charcoal" />
-                      </div>
-                    </div>
-                  </div>
-                  <span className="text-xs tracking-wider text-muted-foreground uppercase block transition-colors duration-300 group-hover:text-foreground">
-                    {relatedProduct.collection}
+            <ScrollSection animation="fade-up">
+              <div className="flex items-end justify-between mb-12">
+                <div>
+                  <span className="text-xs tracking-[0.3em] uppercase text-muted-foreground mb-4 block">
+                    You May Also Like
                   </span>
-                  <h3 className="font-serif text-xl text-foreground mt-2 group-hover:text-muted-foreground transition-all duration-300 group-hover:translate-y-[-2px]">
-                    {relatedProduct.name}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mt-2 group-hover:text-foreground/70 transition-colors duration-300">
-                    {relatedProduct.material} / {relatedProduct.finish}
-                  </p>
+                  <h2 className="font-serif text-3xl md:text-4xl text-foreground">
+                    Related Products
+                  </h2>
+                </div>
+                <Link
+                  href="/products"
+                  className="hidden sm:inline-flex items-center gap-2 text-foreground text-sm tracking-wider uppercase hover:gap-4 transition-all duration-300"
+                >
+                  <span>View All</span>
+                  <ArrowRight className="w-4 h-4" />
                 </Link>
-              ))}
-            </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {relatedProductsData.map((relatedProduct, index) => (
+                  <Link
+                    key={relatedProduct.id}
+                    href={`/products/${relatedProduct.id}`}
+                    className="group"
+                    style={{
+                      animation: `slide-up 0.6s ease-out ${index * 0.1}s both`,
+                    }}
+                  >
+                    <div className="relative aspect-[4/5] overflow-hidden rounded-2xl mb-4 bg-secondary border border-border/0 group-hover:border-border transition-all duration-500">
+                      <Image
+                        src={relatedProduct.image}
+                        alt={relatedProduct.name}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-charcoal/0 group-hover:bg-charcoal/25 transition-colors duration-300" />
+
+                      {/* Hover button at bottom */}
+                      <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-charcoal to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-end justify-center pb-6">
+                        <button className="px-8 py-3 bg-warm-white text-charcoal font-medium tracking-wider uppercase text-sm rounded-lg transition-all duration-300 transform translate-y-4 group-hover:translate-y-0 hover:bg-warm-white/90 active:scale-95">
+                          Ver Producto
+                        </button>
+                      </div>
+                    </div>
+                    <span className="text-xs tracking-wider text-muted-foreground uppercase block transition-colors duration-300 group-hover:text-foreground">
+                      {relatedProduct.collection}
+                    </span>
+                    <h3 className="font-serif text-xl text-foreground mt-2 group-hover:text-muted-foreground transition-all duration-300 group-hover:translate-y-[-2px]">
+                      {relatedProduct.name}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mt-2 group-hover:text-foreground/70 transition-colors duration-300">
+                      {relatedProduct.material} / {relatedProduct.finish}
+                    </p>
+                  </Link>
+                ))}
+              </div>
+            </ScrollSection>
           </div>
         </section>
       )}
